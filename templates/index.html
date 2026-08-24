@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penjaga Udara — Klasifikasi Kualitas Udara Jakarta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="haze"></div>
+
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="topbar__mark" aria-hidden="true"></span>
+    <span class="topbar__name">Penjaga Udara</span>
+  </div>
+  <span class="topbar__tag">DKI Jakarta &middot; Stasiun Bunderan HI</span>
+</header>
+
+<main class="layout">
+
+  <section class="intro">
+    <p class="intro__eyebrow">Model XGBoost &middot; 6 parameter polutan</p>
+    <h1 class="intro__title">Masukkan angka polutan,<br>lihat udaranya sehat atau tidak.</h1>
+    <p class="intro__body">
+      Isi konsentrasi enam polutan di bawah ini — PM2.5, PM10, SO2, CO, O3, dan NO2 —
+      lalu tekan <strong>Enter</strong> atau klik cek. Sistem akan memprediksi kategori
+      kualitas udara beserta saran pencegahan yang sesuai.
+    </p>
+  </section>
+
+  <div class="panels">
+
+    <!-- FORM PANEL -->
+    <section class="card form-card" aria-label="Form input polutan">
+      <form id="airForm" novalidate>
+        <div class="field-grid" id="fieldGrid">
+          {% for f in features %}
+          <label class="field" for="{{ f }}">
+            <span class="field__name">{{ f | upper }}</span>
+            <span class="field__unit">&micro;g/m&sup3;{% if f == 'co' %} (mg/m&sup3;){% endif %}</span>
+            <input
+              type="number"
+              inputmode="decimal"
+              step="any"
+              min="0"
+              id="{{ f }}"
+              name="{{ f }}"
+              placeholder="0"
+              required
+            >
+          </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-check" id="btnCheck">
+          <span class="btn-check__label">Cek kualitas udara</span>
+          <span class="btn-check__spinner" aria-hidden="true"></span>
+        </button>
+        <p class="form-error" id="formError" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- RESULT PANEL -->
+    <section class="card result-card" aria-label="Hasil klasifikasi" id="resultCard">
+
+      <div class="result-empty" id="resultEmpty">
+        <div class="result-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="40" height="40">
+            <path d="M8 24c8-14 40-14 48 0M14 34c6-9 30-9 36 0M22 44c4-5 16-5 20 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p>Hasil klasifikasi akan muncul di sini setelah kamu mengisi data.</p>
+      </div>
+
+      <div class="result-content" id="resultContent" hidden>
+        <p class="result-content__eyebrow">Kategori kualitas udara</p>
+        <h2 class="result-content__kategori" id="resKategori">—</h2>
+
+        <div class="horizon" aria-hidden="true">
+          <div class="horizon__track">
+            <div class="horizon__zone horizon__zone--baik"></div>
+            <div class="horizon__zone horizon__zone--sedang"></div>
+            <div class="horizon__zone horizon__zone--tidaksehat"></div>
+          </div>
+          <div class="horizon__marker" id="horizonMarker"></div>
+          <div class="horizon__labels">
+            <span>BAIK</span>
+            <span>SEDANG</span>
+            <span>TIDAK SEHAT</span>
+          </div>
+        </div>
+
+        <p class="result-content__confidence" id="resConfidence"></p>
+        <p class="result-content__deskripsi" id="resDeskripsi"></p>
+
+        <div class="result-content__saran">
+          <p class="result-content__saran-title">Saran &amp; pencegahan</p>
+          <ul id="resSaran"></ul>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <p class="footnote">
+    Prediksi bersifat estimatif berdasarkan data historis stasiun DKI1 (Bunderan HI) dan bukan pengganti
+    informasi resmi ISPU dari KLHK / instansi terkait.
+  </p>
+
+</main>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
